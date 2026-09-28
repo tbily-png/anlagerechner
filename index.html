@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anlagerechner Pflegeappartement oder Personalwohnung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#A3143C; --red-soft:#F6E6EB; --ink:#1C1A1B; --muted:#6B6668; --line:#DAD7D8;
+  --paper:#FFFFFF; --panel:#F2F2F3; --pa:#A3143C; --pw:#3E5C76; --pw-soft:#E4EAF0;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --red:#E0557A; --red-soft:#3A1822; --ink:#F1EEEF; --muted:#A8A2A4; --line:#3A3638;
+    --paper:#171516; --panel:#221F20; --pa:#E0557A; --pw:#8DB0CF; --pw-soft:#1E2A35; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --red:#E0557A; --red-soft:#3A1822; --ink:#F1EEEF; --muted:#A8A2A4; --line:#3A3638;
+  --paper:#171516; --panel:#221F20; --pa:#E0557A; --pw:#8DB0CF; --pw-soft:#1E2A35; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 48px}
+header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:28px}
+h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.02em;margin:0;font-weight:800}
+.sub{color:var(--red);font-size:clamp(1.05rem,2.2vw,1.35rem);margin:.4rem 0 0}
+.logo{font-weight:800;font-size:2.4rem;color:var(--red);letter-spacing:-.02em;line-height:1;display:flex;align-items:flex-start}
+.logo span{display:inline-block;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:9px solid var(--red);margin:2px 0 0 3px}
+.intro{max-width:66ch;color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+@media (max-width:860px){aside{position:static}}
+fieldset{border:0;margin:0 0 22px;padding:0}
+legend{font-weight:700;font-size:1.05rem;margin-bottom:10px;padding:0}
+.field{margin-bottom:14px}
+.field label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;margin-bottom:4px}
+.field label output{font-weight:700;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--red);height:28px}
+select,input[type=number],input[type=text],input[type=email],input[type=tel]{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{flex:1;font:inherit;padding:8px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--red);color:#fff}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+details{border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+summary{cursor:pointer;font-weight:600;font-size:.95rem}
+.adv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.adv .field{margin:0}
+.adv label{font-size:.82rem}
+.hint{font-size:.8rem;color:var(--muted);margin:4px 0 0}
+
+/* Waage */
+.verdict{background:var(--panel);border-radius:10px;padding:22px;margin-bottom:28px}
+.verdict h2{margin:0 0 4px;font-size:1.5rem;letter-spacing:-.01em}
+.verdict p{margin:0 0 16px;color:var(--muted)}
+.bal-labels{display:flex;justify-content:space-between;gap:12px;font-weight:600;margin-bottom:8px;font-size:1.05rem}
+.bal-labels strong{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+.l-pa{color:var(--pa)} .l-pw{color:var(--pw);text-align:right}
+.balance{display:flex;height:22px;border-radius:8px;overflow:hidden;font-weight:700;color:#fff}
+.balance div{display:flex;align-items:center;padding:0 14px;transition:flex-basis .5s ease;white-space:nowrap;overflow:hidden}
+.balance .b-pa{background:var(--pa)} .balance .b-pw{background:var(--pw);justify-content:flex-end}
+.prio{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 24px;margin-top:20px}
+.prio .field{margin-bottom:6px}
+.prio small{display:block;color:var(--muted);font-size:.78rem;margin-top:-4px}
+
+.info-btn{font:inherit;font-size:.75rem;font-weight:700;width:20px;height:20px;border-radius:50%;border:1px solid var(--muted);background:transparent;color:var(--muted);cursor:pointer;margin-left:6px;line-height:1;padding:0;vertical-align:1px}
+.info-btn[aria-expanded=true]{background:var(--red);border-color:var(--red);color:#fff}
+.info{display:none;background:var(--paper);border-left:3px solid var(--red);border-radius:4px;padding:10px 12px;font-size:.86rem;line-height:1.45;margin:4px 0 10px}
+.info.open{display:block}
+.info b{font-weight:700}
+/* Ergebnisse */
+h2.sec{font-size:1.3rem;margin:0 0 12px}
+.tablewrap{overflow-x:auto;margin-bottom:28px}
+table{width:100%;border-collapse:collapse;min-width:520px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:1rem;border-bottom:2px solid var(--ink)}
+td.pa{background:var(--panel)}
+th.pa-h{color:var(--pa)} th.pw-h{color:var(--pw)}
+tbody th{font-weight:600;width:38%}
+tr.key td{font-weight:800;font-size:1.08rem}
+.pos{color:inherit} .neg{color:var(--red)}
+.chart{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:28px}
+.legend{display:flex;gap:18px;font-size:.88rem;margin-bottom:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+svg text{fill:var(--muted);font-size:11px;font-family:inherit}
+
+/* Kontakt */
+.full{margin-top:32px}
+.contact{display:block;gap:28px;border-top:2px solid var(--ink);padding-top:24px}
+@media (max-width:700px){.contact{grid-template-columns:1fr}}
+.contact h2{margin:0 0 8px;font-size:1.3rem}
+.btn{display:inline-block;font:inherit;font-weight:700;background:var(--red);color:#fff;border:0;border-radius:6px;padding:12px 18px;cursor:pointer;text-decoration:none;margin:6px 8px 0 0}
+.btn.ghost{background:transparent;color:var(--red);border:1px solid var(--red)}
+.sig{font-size:.95rem;line-height:1.55}
+.sig strong{font-size:1.05rem}
+.sig .firm{color:var(--red);font-weight:700;margin-top:10px;display:block}
+.sig a{color:inherit}
+.note{font-size:.8rem;color:var(--muted);margin-top:28px;max-width:80ch}
+footer.claim{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--line)}
+footer.claim p{margin:0;color:var(--red);font-weight:800;font-size:clamp(1.2rem,3vw,1.7rem);letter-spacing:-.01em}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:6px;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.balance div{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Welche Anlage passt zu Ihnen?</h1>
+      <p class="sub">Pflegeappartement und Personalwohnung im Vergleich</p>
+    </div>
+  </header>
+  <p class="intro">Geben Sie Ihre Eckdaten ein und gewichten Sie, was Ihnen bei der Geldanlage wichtig ist. Der Rechner zeigt Ihnen, wie sich beide Wohnformen für Ihre Situation entwickeln und welche besser zu Ihren Zielen passt.</p>
+
+  <div class="grid">
+    <aside>
+      <fieldset>
+        <legend>Ihre Situation</legend>
+        <div class="field"><label for="ek">Eigenkapital <output id="ek-o"></output></label><input type="range" id="ek" min="0" max="250000" step="5000" value="50000"></div>
+        <div class="field"><label for="inc">Zu versteuerndes Jahreseinkommen <output id="inc-o"></output></label><input type="range" id="inc" min="20000" max="300000" step="2500" value="80000"></div>
+        <div class="field"><label for="age">Ihr Alter <output id="age-o"></output></label><input type="range" id="age" min="25" max="70" step="1" value="45"></div>
+        <div class="field"><label>Veranlagung</label>
+          <div class="seg" id="fam"><button type="button" data-v="single" aria-pressed="true">Einzeln</button><button type="button" data-v="joint" aria-pressed="false">Zusammen (verheiratet)</button></div>
+        </div>
+        <input type="hidden" id="hor" value="15">
+      </fieldset>
+      <fieldset>
+        <legend>Objekt</legend>
+        <!-- Beispielwohnungen laut Exposé: Pflegeappartement EZ Nr. 1, Personalwohnung 1-Zi. Nr. 160 -->
+        <input type="hidden" id="kp1" value="290300"><input type="hidden" id="kp2" value="202700">
+        <input type="hidden" id="m1" value="10447.30"><input type="hidden" id="m2" value="5978.40">
+        <input type="hidden" id="v1" value="29.90"><input type="hidden" id="v2" value="39.98">
+        <input type="hidden" id="rl1" value="131.68"><input type="hidden" id="rl2" value="201.77">
+        <input type="hidden" id="qm2" value="24.91"><input type="hidden" id="mob2" value="8000">
+        <input type="checkbox" id="s7b" checked hidden>
+        <details>
+          <summary>Annahmen anpassen</summary>
+          <div class="adv">
+            <div class="field"><label for="zkfw">Zins KfW 298 (%)</label><input type="number" id="zkfw" value="2.2" step="0.1" min="0"></div>
+            <div class="field"><label for="zbank">Zins Bank (%)</label><input type="number" id="zbank" value="3.8" step="0.1" min="0"></div>
+            <div class="field"><label for="tilg">Anfängl. Tilgung (%)</label><input type="number" id="tilg" value="2" step="0.5" min="0"></div>
+            <div class="field"><label for="nk">Kaufnebenkosten (%)</label><input type="number" id="nk" value="5.5" step="0.5" min="0"></div>
+            <div class="field"><label for="occ">Vermietungsquote Personalw. (%)</label><input type="number" id="occ" value="95" step="1" min="50" max="100"></div>
+            <div class="field"><label for="geb">Gebäudeanteil (%)</label><input type="number" id="geb" value="85" step="1" min="50" max="100"></div>
+            <div class="field"><label for="vpi">Inflation p.a. (%)</label><input type="number" id="vpi" value="2" step="0.1" min="0"></div>
+            <div class="field"><label for="mpw">Mietsteigerung Personalwohnung p.a. (%)</label><input type="number" id="mpw" value="1.5" step="0.1" min="0"></div>
+            <div class="field"><label for="wert">Wertentwicklung p.a. (%)</label><input type="number" id="wert" value="0" step="0.5"></div>
+          </div>
+          <p class="hint">Ohne Angabe wird wie in der Vergleichsübersicht keine Wertsteigerung angesetzt.</p>
+        </details>
+      </fieldset>
+    </aside>
+
+    <main>
+      <section class="verdict" aria-live="polite">
+        <h2>Was ist Ihnen wichtig?</h2>
+        <p>Verschieben Sie die Regler. Der Balken zeigt, welche Anlage besser zu Ihren Zielen passt.</p>
+        <div class="bal-labels"><span class="l-pa">Pflegeappartement <strong id="p-pa"></strong></span><span class="l-pw"><strong id="p-pw"></strong> Personalwohnung</span></div>
+        <div class="balance"><div class="b-pa" id="b-pa"></div><div class="b-pw" id="b-pw"></div></div>
+        <div class="prio" id="prio"></div>
+      </section>
+
+
+    </main>
+  </div>
+  <div class="full">
+      <h2 class="sec">Ihre Zahlen im Vergleich</h2>
+      <p class="hint" style="margin:-6px 0 12px">Verkauf frühestens nach 10 Jahren, denn dann ist der Gewinn aus dem Verkauf steuerfrei.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th></th><th class="pa-h">Pflegeappartement</th><th class="pw-h">Personalwohnung</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+          <section class="contact">
+        <div class="sig">
+          <strong>Thomas Bily</strong><br>
+          Freier Berater<br>
+          Vertrieb, Marketing und Kommunikation<br><br>
+          M: <a href="tel:+4915158055091">0151 58055091</a><br>
+          E: <a href="mailto:t.bily@erl.de">t.bily@erl.de</a>
+        </div>
+      </section>
+
+      <p class="note">Beispielrechnung auf Basis der Exposés: Pflegeappartement EZ Nr. 1 (290.300 €, Miete 10.447,30 € p.a.), Personalwohnung 1-Zimmer Nr. 160 (202.700 € inkl. 8.000 € Mobiliar, 24,91 m², Mietzins 20 €/m²). Instandhaltungs- bzw. Erhaltungsrücklage ist berücksichtigt. Alle Angaben unverbindlich und ohne Gewähr; maßgeblich sind die Vereinbarungen im Kaufvertrag. Die Berechnung ersetzt keine Steuerberatung. Berücksichtigt sind Mieteinnahmen, Verwaltungskosten, Zinsen, steuerliche Ergebnisse (Einkommensteuertarif 2025, ohne Solidaritätszuschlag und Kirchensteuer) und Kaufnebenkosten. Verkauf nach mindestens 10 Jahren, damit steuerfrei. Pflegeappartement: Mietbeginn nach 2 Monaten Pre-Opening, Indexierung 7 % je 10 % VPI-Anstieg. Personalwohnung: Vermietung über die ERL Immobilienverwaltungs GmbH, Miete der Monate 1 bis 6 wird gesammelt und ab dem 7. Monat ausgezahlt, Möblierung anteilig im Kaufpreis enthalten. Die Sonderabschreibung nach § 7b EStG setzt u. a. Baukostenobergrenzen voraus, die Bemessungsgrundlage ist auf 4.000 € je m² begrenzt. KfW 298 bis 150.000 € je Wohneinheit, Zinssatz beispielhaft.</p>
+  </div>
+
+      <div class="chart">
+        <h2 class="sec" style="margin-bottom:4px">Ihr Ergebnis bei Verkauf nach Jahren</h2>
+        <div class="legend"><span><i style="background:var(--pa)"></i>Pflegeappartement</span><span><i style="background:var(--pw)"></i>Personalwohnung</span></div>
+        <div id="chart"></div>
+      </div>
+
+  </div>
+
+  <footer class="claim"><p>Wir bauen auf Vertrauen.</p></footer>
+</div>
+<div class="toast" id="toast">Ergebnis kopiert</div>
+
+<script>
+const eur = new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+const eur2 = new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'});
+const $ = id => document.getElementById(id);
+const state = {fam:'single', afa:'deg'};
+
+// Qualitative Einschätzung (0 bis 10) aus der Vergleichsübersicht
+const CRIT = [
+  {id:'rendite', name:'Rendite', desc:'Möglichst hoher Gesamtertrag', w:8},
+  {id:'steuer', name:'Steuervorteil', desc:'Steuerlast heute senken', w:3},
+  {id:'sicher', info:"Das Pflegeappartement ist 25 Jahre mit 5 Jahren Verlängerungsoption fest an die AWO Kreisverband Fürth-Land e.V. vermietet. Die Miete fließt in gleichbleibender Höhe, egal ob das Zimmer gerade belegt ist. Bei der Personalwohnung hängt die Miete von der tatsächlichen Vermietung ab. Der Mietpool gleicht Schwankungen aus und verteilt das Leerstandsrisiko auf alle Eigentümer, hebt es aber nicht auf.", name:'Sicherheit (kein Leerstandsrisiko)', desc:'Feste Miete über 25 Jahre, auch bei Leerstand', w:9, pa:9, pw:6},
+  {id:'wieder', info:"Die Personalwohnung ist eine klassische Wohnung und lässt sich an einen breiten Käuferkreis verkaufen, auch an Eigennutzer. Das Pflegeappartement ist eine Spezialimmobilie und wird vor allem von Kapitalanlegern gekauft. Dafür macht der langfristige Mietvertrag mit der AWO es für diese Käufer besonders attraktiv, weil sie eine gesicherte Miete übernehmen.", name:'Wiederverkaufbarkeit', desc:'Wie leicht sich die Immobilie später verkaufen lässt', w:5, pa:6, pw:8},
+  {id:'inflation', info:"Beim Pflegeappartement steigt die Miete um 7 %, sobald der Verbraucherpreisindex um 10 % gestiegen ist. Die Miete wächst also automatisch mit. Bei der Personalwohnung gibt es keine Indexierung, Erhöhungen richten sich nach dem regulären Mietrecht.", name:'Inflationsschutz', desc:'Miete wächst mit den Preisen', w:8, pa:8, pw:5},
+  {id:'aufwand', info:"Beim Pflegeappartement kümmert sich der Betreiber um Möblierung und Belegung, Sie haben mit Bewohnern nichts zu tun. Bei der Personalwohnung übernimmt die ERL Immobilienverwaltung die Vermietung, Mieterwechsel sind aber häufiger.", name:'Wenig Aufwand', desc:'Betreiber kümmert sich um alles', w:5, pa:9, pw:7},
+];
+
+function est(x){ x=Math.floor(Math.max(0,x));
+  if(x<=12096) return 0;
+  if(x<=17443){const y=(x-12096)/1e4; return (932.30*y+1400)*y;}
+  if(x<=68480){const z=(x-17443)/1e4; return (176.64*z+2397)*z+1015.13;}
+  if(x<=277825) return 0.42*x-10911.92;
+  return 0.45*x-19246.67; }
+function tax(zve){ return state.fam==='joint' ? 2*est(zve/2) : est(zve); }
+
+function simulate(p){
+  const {kp, miete, verw, type, ek, inc, years, qm=0, mob=0} = p;
+  const nkq = +$('nk').value/100, geb=+$('geb').value/100;
+  const zk=+$('zkfw').value/100, zb=+$('zbank').value/100, tl=+$('tilg').value/100;
+  const vpi=+$('vpi').value/100, mpw=+$('mpw').value/100, wert=+$('wert').value/100;
+  const nk = kp*nkq, need = kp+nk, ekUsed=Math.min(ek,need), loan=need-ekUsed;
+  const loans=[{b:Math.min(150000,loan), r:zk},{b:Math.max(0,loan-150000), r:zb}].map(l=>({...l, ann:l.b*(l.r+tl)}));
+  const rate = loans.reduce((s,l)=>s+l.ann,0)/12;
+  const mobBasis = mob, basis = (need-mob)*geb, basis7b = qm ? Math.min(basis, 4000*qm) : basis;
+  let mobRest = mobBasis;
+  let rent = miete, cpi=1, lastAdj=1, rest=basis, cum=-nk;
+  const rows=[];
+  for(let t=1;t<=40;t++){
+    if(t>1){
+      cpi*= (1+vpi);
+      if(type==='pa'){ while(cpi/lastAdj>=1.10){ rent*=1.07; lastAdj*=1.10; } }
+      else rent*=(1+mpw);
+    }
+    const months = (type==='pa' && t===1) ? 10 : 12;
+    const r = rent*months/12;
+    let interest=0, tilg=0;
+    loans.forEach(l=>{ if(l.b<=0) return; const i=l.b*l.r; const pay=Math.min(l.ann, l.b+i); interest+=i; tilg+=pay-i; l.b-=pay-i; });
+    let afa;
+    if(type==='pa') afa=basis*0.03;
+    else if(state.afa==='deg'){ afa=Math.max(rest*0.05, basis*0.03); }
+    else afa=basis*0.03;
+    afa=Math.min(afa,rest); rest-=afa;
+    const mobAfa=Math.min(mobBasis*0.10, mobRest); mobRest-=mobAfa; afa+=mobAfa;
+    let sonder=0; if(type==='pw' && $('s7b').checked && t<=4) sonder=basis7b*0.05;
+    const result = r - verw - interest - afa - sonder;
+    const taxEff = tax(inc) - tax(inc+result);
+    const cash = r - verw - interest - tilg + taxEff;
+    cum += r - verw - interest + taxEff;
+    const debt = loans.reduce((s,l)=>s+Math.max(0,l.b),0);
+    const sale = kp*Math.pow(1+wert,t);
+    rows.push({t, rent:r, interest, tilg, taxEff, cash, debt, gain: cum + (sale-kp), rentM: rent/12});
+  }
+  return {rows, loan, ekUsed, rate, nk, need};
+}
+
+function buildPrio(){
+  $('prio').innerHTML = CRIT.map(c=>`<div class="field"><label for="w-${c.id}"><span>${c.name}<button type="button" class="info-btn" aria-expanded="false" aria-controls="i-${c.id}" aria-label="Erklärung zu ${c.name}" data-id="${c.id}">i</button></span> <output id="w-${c.id}-o">${c.w}</output></label><div class="info" id="i-${c.id}">${c.info||''}</div><input type="range" id="w-${c.id}" min="0" max="10" value="${c.w}"><small>${c.desc}</small></div>`).join('');
+  $('prio').addEventListener('click',e=>{
+    const b=e.target.closest('.info-btn'); if(!b) return; e.preventDefault();
+    const box=$('i-'+b.dataset.id), open=!box.classList.contains('open');
+    box.classList.toggle('open',open); b.setAttribute('aria-expanded',open);
+  });
+}
+function render(){
+  const ek=+$('ek').value, inc=+$('inc').value, age=+$('age').value, years=+$('hor').value;
+  $('ek-o').textContent=eur.format(ek); $('inc-o').textContent=eur.format(inc);
+  $('age-o').textContent=age+' Jahre'; 
+  CRIT.forEach(c=>$(`w-${c.id}-o`).textContent=$(`w-${c.id}`).value);
+
+  const occ=+$('occ').value/100;
+  const A = simulate({kp:+$('kp1').value, miete:+$('m1').value, verw:+$('v1').value*12 + +$('rl1').value, type:'pa', ek, inc, years});
+  const B = simulate({kp:+$('kp2').value, miete:+$('m2').value*occ, verw:+$('v2').value*12 + +$('rl2').value, type:'pw', ek, inc, years, qm:+$('qm2').value, mob:+$('mob2').value});
+  const yld1=100*$('m1').value/$('kp1').value, yld2=100*$('m2').value/$('kp2').value;
+  const yRet = Math.max(1, Math.min(40, 67-age));
+  const a=A.rows, b=B.rows;
+  const g = (s,y)=>s.rows[y-1].gain;
+  const tax4 = s=>s.rows.slice(0,4).reduce((x,r)=>x+r.taxEff,0);
+  const cash1 = s=>s.rows[1].cash/12;
+
+  const rowsT = [
+    ['Kaufpreis', eur.format(+$('kp1').value), eur.format(+$('kp2').value)],
+    ['Brutto-Mietrendite', yld1.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' %', yld2.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' % (bei Vollvermietung)'],
+    ['Verwaltung und Rücklage monatlich', eur2.format(+$('v1').value + $('rl1').value/12), eur2.format(+$('v2').value + $('rl2').value/12)],
+    ['Eigenkapital eingesetzt', eur.format(A.ekUsed), eur.format(B.ekUsed)],
+    ['Darlehen (inkl. Nebenkosten)', eur.format(A.loan), eur.format(B.loan)],
+    ['Monatliche Kreditrate', eur.format(A.rate), eur.format(B.rate)],
+    ['Miete monatlich zu Beginn', eur.format(a[0].rentM), eur.format(b[0].rentM)],
+    ['Monatlich nach Steuern (Jahr 2)', sign(cash1(A)), sign(cash1(B))],
+    ['Steuerersparnis erste 4 Jahre', eur.format(tax4(A)), eur.format(tax4(B))],
+    ['Ergebnis bei Verkauf nach 10 Jahren', sign(g(A,10)), sign(g(B,10))],
+    [`Ergebnis bei Verkauf nach ${years} Jahren`, sign(g(A,years)), sign(g(B,years)), true],
+    [`Restschuld mit 67 (in ${yRet} J.)`, eur.format(a[yRet-1].debt), eur.format(b[yRet-1].debt)],
+    ['Miete monatlich mit 67', eur.format(a[yRet-1].rentM), eur.format(b[yRet-1].rentM)],
+  ];
+  $('tbody').innerHTML = rowsT.map(r=>`<tr${r[3]?' class="key"':''}><th scope="row">${r[0]}</th><td class="pa">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+
+  // Bewertung: Vorsprung je Kriterium (-1 bis +1), gewichtet, dann verstärkt
+  const rel=(x,y)=>{const m=Math.max(Math.abs(x),Math.abs(y),1); return Math.max(-1,Math.min(1,(x-y)/m));};
+  let D=0,wt=0;
+  CRIT.forEach(c=>{ const w=+$(`w-${c.id}`).value; let d;
+    if(c.id==='rendite') d=(g(A,years)-g(B,years))/20000;
+    else if(c.id==='steuer') d=(tax4(A)-tax4(B))/40000;
+    else d=(c.pa-c.pw)/5;
+    d=Math.max(-1,Math.min(1,d)); D+=w*d; wt+=w; });
+  D = wt? D/wt : 0;
+  const pA = Math.round(50+50*Math.tanh(2.5*D)), pB=100-pA;
+  $('b-pa').style.flexBasis=pA+'%'; $('b-pw').style.flexBasis=pB+'%';
+  $('p-pa').textContent=pA+' %'; $('p-pw').textContent=pB+' %';
+  const win = pA>=pB ? 'Pflegeappartement' : 'Personalwohnung';
+
+  { const gA=g(A,years), gB=g(B,years), lead=gA>=gB?'das Pflegeappartement':'die Personalwohnung';
+    const r1=yld1.toLocaleString('de-DE',{maximumFractionDigits:2}), r2=yld2.toLocaleString('de-DE',{maximumFractionDigits:2});
+    $('i-rendite').innerHTML=`Das Pflegeappartement bringt ${r1} % Brutto-Mietrendite, die Personalwohnung ${r2} % bei Vollvermietung. Bei der Personalwohnung ist die Miete belegungsabhängig, gerechnet wird mit ${Math.round(occ*100)} % Vermietung. Pro investiertem Euro fließt beim Pflegeappartement also mehr Miete, und durch die Indexierung wächst sie weiter. Die Personalwohnung holt einen Teil über höhere Steuervorteile in den ersten Jahren wieder auf. <b>Mit Ihren Angaben liegt nach ${years} Jahren ${lead} um ${eur.format(Math.abs(gA-gB))} vorne.</b>`;
+    const tA=tax4(A), tB=tax4(B);
+    $('i-steuer').innerHTML=`Bei der Personalwohnung sind 5 % degressive Abschreibung plus 5 % Sonderabschreibung nach § 7b in den ersten vier Jahren möglich, beim Pflegeappartement 3 % linear. Höhere Abschreibungen senken Ihr zu versteuerndes Einkommen. Je höher Ihr Steuersatz, desto stärker wirkt das. <b>Mit Ihren Angaben sparen Sie in den ersten vier Jahren ${eur.format(tB)} (Personalwohnung) gegenüber ${eur.format(tA)} (Pflegeappartement).</b>`; }
+  drawChart(a,b);
+  window._summary = `Anlagerechner\nEigenkapital: ${eur.format(ek)}, zvE: ${eur.format(inc)}, Alter: ${age}, ${state.fam==='joint'?'zusammen veranlagt':'einzeln veranlagt'}\nKaufpreis Pflegeappartement: ${eur.format(+$('kp1').value)}, Personalwohnung: ${eur.format(+$('kp2').value)}\nErgebnis nach ${years} Jahren: Pflegeappartement ${eur.format(g(A,years))}, Personalwohnung ${eur.format(g(B,years))}\nSteuerersparnis erste 4 Jahre: PA ${eur.format(tax4(A))}, Personalwohnung ${eur.format(tax4(B))}\nPassung: Pflegeappartement ${pA} %, Personalwohnung ${pB} %`;
+}
+function sign(v){ return `<span class="${v<0?'neg':'pos'}">${v>0?'+':''}${eur.format(v)}</span>`; }
+
+function drawChart(a,b){
+  const N=25, W=640, H=240, pl=58, pr=12, pt=10, pb=26;
+  const A=a.slice(0,N).map(r=>r.gain), B=b.slice(0,N).map(r=>r.gain);
+  const all=[...A,...B,0]; let mn=Math.min(...all), mx=Math.max(...all); if(mx===mn) mx=mn+1;
+  const x=i=>pl+(W-pl-pr)*i/(N-1), y=v=>pt+(H-pt-pb)*(1-(v-mn)/(mx-mn));
+  const path=arr=>arr.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)).join('');
+  let ticks=''; for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4; ticks+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end">${Math.round(v/1000)} T€</text>`;}
+  let xt=''; [1,5,10,15,20,25].forEach(t=>xt+=`<text x="${x(t-1)}" y="${H-6}" text-anchor="middle">${t} J.</text>`);
+  $('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Ergebnis bei Verkauf nach Jahren">${ticks}<line x1="${pl}" x2="${W-pr}" y1="${y(0)}" y2="${y(0)}" stroke="var(--muted)"/>${xt}<path d="${path(A)}" fill="none" stroke="var(--pa)" stroke-width="3"/><path d="${path(B)}" fill="none" stroke="var(--pw)" stroke-width="3"/></svg>`;
+}
+
+
+document.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  seg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', x===b));
+  state[seg.id]=b.dataset.v; render();
+}));
+buildPrio();
+document.addEventListener('input', render);
+document.addEventListener('change', render);
+render();
+</script>
+</body>
+</html>
