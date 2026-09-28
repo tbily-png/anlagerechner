@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Anlagerechner Pflegeappartement oder Personalwohnung</title>
+<title>Pflegeappartements und Personalwohnungen in Zirndorf: Welche Immobilie passt besser zu Ihnen?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,8 +29,8 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5}
 .wrap{max-width:1120px;margin:0 auto;padding:32px 20px 48px}
 header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:1px solid var(--line);padding-bottom:24px;margin-bottom:28px}
-h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.02em;margin:0;font-weight:800}
-.sub{color:var(--red);font-size:clamp(1.05rem,2.2vw,1.35rem);margin:.4rem 0 0}
+h1{font-size:clamp(1.6rem,3.6vw,2.3rem);line-height:1.02;letter-spacing:-.02em;margin:0;font-weight:800}
+.sub{color:var(--red);font-size:clamp(1.2rem,2.8vw,1.7rem);font-weight:600;margin:.5rem 0 0}
 .logo{font-weight:800;font-size:2.4rem;color:var(--red);letter-spacing:-.02em;line-height:1;display:flex;align-items:flex-start}
 .logo span{display:inline-block;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:9px solid var(--red);margin:2px 0 0 3px}
 .intro{max-width:66ch;color:var(--muted);margin:0 0 28px}
@@ -39,7 +39,8 @@ h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.02em;margi
 aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
 @media (max-width:860px){aside{position:static}}
 fieldset{border:0;margin:0 0 22px;padding:0}
-legend{font-weight:700;font-size:1.05rem;margin-bottom:10px;padding:0}
+legend,.verdict h2,h2.sec{font-weight:700;font-size:1.35rem;letter-spacing:-.01em;line-height:1.25}
+legend{margin-bottom:10px;padding:0}
 .field{margin-bottom:14px}
 .field label{display:flex;justify-content:space-between;gap:8px;font-size:.93rem;margin-bottom:4px}
 .field label output{font-weight:700;font-variant-numeric:tabular-nums}
@@ -58,7 +59,7 @@ summary{cursor:pointer;font-weight:600;font-size:.95rem}
 
 /* Waage */
 .verdict{background:var(--panel);border-radius:10px;padding:22px;margin-bottom:28px}
-.verdict h2{margin:0 0 4px;font-size:1.5rem;letter-spacing:-.01em}
+.verdict h2{margin:0 0 4px}
 .verdict p{margin:0 0 16px;color:var(--muted)}
 .bal-labels{display:flex;justify-content:space-between;gap:12px;font-weight:600;margin-bottom:8px;font-size:1.05rem}
 .bal-labels strong{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
@@ -76,7 +77,7 @@ summary{cursor:pointer;font-weight:600;font-size:.95rem}
 .info.open{display:block}
 .info b{font-weight:700}
 /* Ergebnisse */
-h2.sec{font-size:1.3rem;margin:0 0 12px}
+h2.sec{margin:0 0 12px}
 .tablewrap{overflow-x:auto;margin-bottom:28px}
 table{width:100%;border-collapse:collapse;min-width:520px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -114,16 +115,16 @@ footer.claim p{margin:0;color:var(--red);font-weight:800;font-size:clamp(1.2rem,
 <div class="wrap">
   <header class="top">
     <div>
-      <h1>Welche Anlage passt zu Ihnen?</h1>
-      <p class="sub">Pflegeappartement und Personalwohnung im Vergleich</p>
+      <h1>Pflegeappartements und Personalwohnungen in Zirndorf</h1>
+      <p class="sub">Welche Immobilie passt besser zu Ihnen?</p>
     </div>
   </header>
-  <p class="intro">Geben Sie Ihre Eckdaten ein und gewichten Sie, was Ihnen bei der Geldanlage wichtig ist. Der Rechner zeigt Ihnen, wie sich beide Wohnformen für Ihre Situation entwickeln und welche besser zu Ihren Zielen passt.</p>
+  <p class="intro">Sie können Ihre Vorgaben machen und der Rechner zeigt Ihnen, welche Immobilie besser zu Ihnen und Ihren Zielen passt.</p>
 
   <div class="grid">
     <aside>
       <fieldset>
-        <legend>Ihre Situation</legend>
+        <legend>Ihre Vorgaben</legend>
         <div class="field"><label for="ek">Eigenkapital <output id="ek-o"></output></label><input type="range" id="ek" min="0" max="250000" step="5000" value="50000"></div>
         <div class="field"><label for="inc">Zu versteuerndes Jahreseinkommen <output id="inc-o"></output></label><input type="range" id="inc" min="20000" max="300000" step="2500" value="80000"></div>
         <div class="field"><label for="age">Ihr Alter <output id="age-o"></output></label><input type="range" id="age" min="25" max="70" step="1" value="45"></div>
@@ -161,7 +162,7 @@ footer.claim p{margin:0;color:var(--red);font-weight:800;font-size:clamp(1.2rem,
 
     <main>
       <section class="verdict" aria-live="polite">
-        <h2>Was ist Ihnen wichtig?</h2>
+        <h2>Ihre Ziele: Was ist Ihnen wichtig?</h2>
         <p>Verschieben Sie die Regler. Der Balken zeigt, welche Anlage besser zu Ihren Zielen passt.</p>
         <div class="bal-labels"><span class="l-pa">Pflegeappartement <strong id="p-pa"></strong></span><span class="l-pw"><strong id="p-pw"></strong> Personalwohnung</span></div>
         <div class="balance"><div class="b-pa" id="b-pa"></div><div class="b-pw" id="b-pw"></div></div>
@@ -179,7 +180,15 @@ footer.claim p{margin:0;color:var(--red);font-weight:800;font-size:clamp(1.2rem,
           <thead><tr><th></th><th class="pa-h">Pflegeappartement</th><th class="pw-h">Personalwohnung</th></tr></thead>
           <tbody id="tbody"></tbody>
         </table>
-          <section class="contact">
+      </div>
+
+      <div class="chart">
+        <h2 class="sec" style="margin-bottom:4px">Ihr Ergebnis bei Verkauf nach x Jahren</h2>
+        <div class="legend"><span><i style="background:var(--pa)"></i>Pflegeappartement</span><span><i style="background:var(--pw)"></i>Personalwohnung</span></div>
+        <div id="chart"></div>
+      </div>
+
+      <section class="contact">
         <div class="sig">
           <strong>Thomas Bily</strong><br>
           Freier Berater<br>
@@ -191,16 +200,6 @@ footer.claim p{margin:0;color:var(--red);font-weight:800;font-size:clamp(1.2rem,
 
       <p class="note">Beispielrechnung auf Basis der Exposés: Pflegeappartement EZ Nr. 1 (290.300 €, Miete 10.447,30 € p.a.), Personalwohnung 1-Zimmer Nr. 160 (202.700 € inkl. 8.000 € Mobiliar, 24,91 m², Mietzins 20 €/m²). Instandhaltungs- bzw. Erhaltungsrücklage ist berücksichtigt. Alle Angaben unverbindlich und ohne Gewähr; maßgeblich sind die Vereinbarungen im Kaufvertrag. Die Berechnung ersetzt keine Steuerberatung. Berücksichtigt sind Mieteinnahmen, Verwaltungskosten, Zinsen, steuerliche Ergebnisse (Einkommensteuertarif 2025, ohne Solidaritätszuschlag und Kirchensteuer) und Kaufnebenkosten. Verkauf nach mindestens 10 Jahren, damit steuerfrei. Pflegeappartement: Mietbeginn nach 2 Monaten Pre-Opening, Indexierung 7 % je 10 % VPI-Anstieg. Personalwohnung: Vermietung über die ERL Immobilienverwaltungs GmbH, Miete der Monate 1 bis 6 wird gesammelt und ab dem 7. Monat ausgezahlt, Möblierung anteilig im Kaufpreis enthalten. Die Sonderabschreibung nach § 7b EStG setzt u. a. Baukostenobergrenzen voraus, die Bemessungsgrundlage ist auf 4.000 € je m² begrenzt. KfW 298 bis 150.000 € je Wohneinheit, Zinssatz beispielhaft.</p>
   </div>
-
-      <div class="chart">
-        <h2 class="sec" style="margin-bottom:4px">Ihr Ergebnis bei Verkauf nach Jahren</h2>
-        <div class="legend"><span><i style="background:var(--pa)"></i>Pflegeappartement</span><span><i style="background:var(--pw)"></i>Personalwohnung</span></div>
-        <div id="chart"></div>
-      </div>
-
-  </div>
-
-  <footer class="claim"><p>Wir bauen auf Vertrauen.</p></footer>
 </div>
 <div class="toast" id="toast">Ergebnis kopiert</div>
 
@@ -215,7 +214,7 @@ const CRIT = [
   {id:'rendite', name:'Rendite', desc:'Möglichst hoher Gesamtertrag', w:8},
   {id:'steuer', name:'Steuervorteil', desc:'Steuerlast heute senken', w:3},
   {id:'sicher', info:"Das Pflegeappartement ist 25 Jahre mit 5 Jahren Verlängerungsoption fest an die AWO Kreisverband Fürth-Land e.V. vermietet. Die Miete fließt in gleichbleibender Höhe, egal ob das Zimmer gerade belegt ist. Bei der Personalwohnung hängt die Miete von der tatsächlichen Vermietung ab. Der Mietpool gleicht Schwankungen aus und verteilt das Leerstandsrisiko auf alle Eigentümer, hebt es aber nicht auf.", name:'Sicherheit (kein Leerstandsrisiko)', desc:'Feste Miete über 25 Jahre, auch bei Leerstand', w:9, pa:9, pw:6},
-  {id:'wieder', info:"Die Personalwohnung ist eine klassische Wohnung und lässt sich an einen breiten Käuferkreis verkaufen, auch an Eigennutzer. Das Pflegeappartement ist eine Spezialimmobilie und wird vor allem von Kapitalanlegern gekauft. Dafür macht der langfristige Mietvertrag mit der AWO es für diese Käufer besonders attraktiv, weil sie eine gesicherte Miete übernehmen.", name:'Wiederverkaufbarkeit', desc:'Wie leicht sich die Immobilie später verkaufen lässt', w:5, pa:6, pw:8},
+  {id:'wieder', info:"Die Personalwohnung ist eine klassische Wohnung und lässt sich an einen breiten Käuferkreis verkaufen, auch an Eigennutzer. Das Pflegeappartement ist eine Spezialimmobilie und wird vor allem von Kapitalanlegern gekauft. Dafür macht der langfristige Mietvertrag mit der AWO es für diese Käufer besonders attraktiv, weil sie eine gesicherte Miete übernehmen.", name:'Wiederverkauf', desc:'Wie leicht sich die Immobilie später verkaufen lässt', w:5, pa:6, pw:8},
   {id:'inflation', info:"Beim Pflegeappartement steigt die Miete um 7 %, sobald der Verbraucherpreisindex um 10 % gestiegen ist. Die Miete wächst also automatisch mit. Bei der Personalwohnung gibt es keine Indexierung, Erhöhungen richten sich nach dem regulären Mietrecht.", name:'Inflationsschutz', desc:'Miete wächst mit den Preisen', w:8, pa:8, pw:5},
   {id:'aufwand', info:"Beim Pflegeappartement kümmert sich der Betreiber um Möblierung und Belegung, Sie haben mit Bewohnern nichts zu tun. Bei der Personalwohnung übernimmt die ERL Immobilienverwaltung die Vermietung, Mieterwechsel sind aber häufiger.", name:'Wenig Aufwand', desc:'Betreiber kümmert sich um alles', w:5, pa:9, pw:7},
 ];
