@@ -211,12 +211,13 @@ const state = {fam:'single', afa:'deg'};
 
 // Qualitative Einschätzung (0 bis 10) aus der Vergleichsübersicht
 const CRIT = [
-  {id:'rendite', name:'Rendite', desc:'Möglichst hoher Gesamtertrag', w:8},
-  {id:'steuer', name:'Steuervorteil', desc:'Steuerlast heute senken', w:3},
-  {id:'sicher', info:"Das Pflegeappartement ist 25 Jahre mit 5 Jahren Verlängerungsoption fest an die AWO Kreisverband Fürth-Land e.V. vermietet. Die Miete fließt in gleichbleibender Höhe, egal ob das Zimmer gerade belegt ist. Bei der Personalwohnung hängt die Miete von der tatsächlichen Vermietung ab. Der Mietpool gleicht Schwankungen aus und verteilt das Leerstandsrisiko auf alle Eigentümer, hebt es aber nicht auf.", name:'Sicherheit (kein Leerstandsrisiko)', desc:'Feste Miete über 25 Jahre, auch bei Leerstand', w:9, pa:9, pw:6},
-  {id:'wieder', info:"Die Personalwohnung ist eine klassische Wohnung und lässt sich an einen breiten Käuferkreis verkaufen, auch an Eigennutzer. Das Pflegeappartement ist eine Spezialimmobilie und wird vor allem von Kapitalanlegern gekauft. Dafür macht der langfristige Mietvertrag mit der AWO es für diese Käufer besonders attraktiv, weil sie eine gesicherte Miete übernehmen.", name:'Wiederverkauf', desc:'Wie leicht sich die Immobilie später verkaufen lässt', w:5, pa:6, pw:8},
-  {id:'inflation', info:"Beim Pflegeappartement steigt die Miete um 7 %, sobald der Verbraucherpreisindex um 10 % gestiegen ist. Die Miete wächst also automatisch mit. Bei der Personalwohnung gibt es keine Indexierung, Erhöhungen richten sich nach dem regulären Mietrecht.", name:'Inflationsschutz', desc:'Miete wächst mit den Preisen', w:8, pa:8, pw:5},
-  {id:'aufwand', info:"Beim Pflegeappartement kümmert sich der Betreiber um Möblierung und Belegung, Sie haben mit Bewohnern nichts zu tun. Bei der Personalwohnung übernimmt die ERL Immobilienverwaltung die Vermietung, Mieterwechsel sind aber häufiger.", name:'Wenig Aufwand', desc:'Betreiber kümmert sich um alles', w:5, pa:9, pw:7},
+  {id:'rendite', name:'Rendite', desc:'Möglichst hoher Gesamtertrag', w:5},
+  {id:'steuer', name:'Steuervorteil', desc:'Steuerlast heute senken', w:5},
+  {id:'sicher', info:"Das Pflegeappartement ist 25 Jahre mit 5 Jahren Verlängerungsoption fest an die AWO Kreisverband Fürth-Land e.V. vermietet. Die Miete fließt in gleichbleibender Höhe, egal ob das Zimmer gerade belegt ist. Bei der Personalwohnung hängt die Miete von der tatsächlichen Vermietung ab. Der Mietpool gleicht Schwankungen aus und verteilt das Leerstandsrisiko auf alle Eigentümer, hebt es aber nicht auf.", name:'Sicherheit (kein Leerstandsrisiko)', desc:'Feste Miete über 25 Jahre, auch bei Leerstand', w:5, pa:9, pw:5},
+  {id:'wieder', info:"Die Personalwohnung ist eine klassische Wohnung und lässt sich an einen breiten Käuferkreis verkaufen, auch an Eigennutzer. Das Pflegeappartement ist eine Spezialimmobilie und wird vor allem von Kapitalanlegern gekauft. Dafür macht der langfristige Mietvertrag mit der AWO es für diese Käufer besonders attraktiv, weil sie eine gesicherte Miete übernehmen.", name:'Wiederverkauf', desc:'Wie leicht sich die Immobilie später verkaufen lässt', w:5, pa:6, pw:5},
+  {id:'liqu', info:'', name:'Monatliche Liquidität', desc:'Monatlicher Überschuss statt Zuzahlung', w:5},
+  {id:'inflation', info:"Beim Pflegeappartement steigt die Miete um 7 %, sobald der Verbraucherpreisindex um 10 % gestiegen ist. Die Miete wächst also automatisch mit. Bei der Personalwohnung gibt es keine Indexierung, Erhöhungen richten sich nach dem regulären Mietrecht.", name:'Inflationsschutz', desc:'Miete wächst mit den Preisen', w:5, pa:8, pw:5},
+  {id:'aufwand', info:"Beim Pflegeappartement kümmert sich der Betreiber um Möblierung und Belegung, Sie haben mit Bewohnern nichts zu tun. Bei der Personalwohnung übernimmt die ERL Immobilienverwaltung Vermietung und Mietpool, die Möblierung ist im Kaufpreis enthalten. Mieterwechsel sind dort häufiger.", name:'Wenig Aufwand', desc:'Betreiber kümmert sich um alles', w:5, pa:9, pw:5},
 ];
 
 function est(x){ x=Math.floor(Math.max(0,x));
@@ -290,6 +291,7 @@ function render(){
   const g = (s,y)=>s.rows[y-1].gain;
   const tax4 = s=>s.rows.slice(0,4).reduce((x,r)=>x+r.taxEff,0);
   const cash1 = s=>s.rows[1].cash/12;
+  const grow = s=>s.rows[14].rentM/s.rows[1].rentM;
 
   const rowsT = [
     ['Kaufpreis', eur.format(+$('kp1').value), eur.format(+$('kp2').value)],
@@ -312,20 +314,27 @@ function render(){
   const rel=(x,y)=>{const m=Math.max(Math.abs(x),Math.abs(y),1); return Math.max(-1,Math.min(1,(x-y)/m));};
   let D=0,wt=0;
   CRIT.forEach(c=>{ const w=+$(`w-${c.id}`).value; let d;
-    if(c.id==='rendite') d=(g(A,years)-g(B,years))/20000;
-    else if(c.id==='steuer') d=(tax4(A)-tax4(B))/40000;
+    // fair: Kennzahlen je eingesetztem Euro (Erwerbsaufwand), da die Kaufpreise unterschiedlich hoch sind
+    if(c.id==='rendite') d=(g(A,years)/A.need-g(B,years)/B.need)/0.15;
+    else if(c.id==='steuer') d=(tax4(A)/A.need-tax4(B)/B.need)/0.12;
+    else if(c.id==='liqu') d=(cash1(A)/A.need-cash1(B)/B.need)*100000/150;
+    else if(c.id==='inflation') d=(grow(A)-grow(B))/0.25;
     else d=(c.pa-c.pw)/5;
     d=Math.max(-1,Math.min(1,d)); D+=w*d; wt+=w; });
   D = wt? D/wt : 0;
-  const pA = Math.round(50+50*Math.tanh(2.5*D)), pB=100-pA;
+  const pA = Math.round(50+50*Math.tanh(2*D)), pB=100-pA;
   $('b-pa').style.flexBasis=pA+'%'; $('b-pw').style.flexBasis=pB+'%';
   $('p-pa').textContent=pA+' %'; $('p-pw').textContent=pB+' %';
   const win = pA>=pB ? 'Pflegeappartement' : 'Personalwohnung';
 
   { const gA=g(A,years), gB=g(B,years), lead=gA>=gB?'das Pflegeappartement':'die Personalwohnung';
     const r1=yld1.toLocaleString('de-DE',{maximumFractionDigits:2}), r2=yld2.toLocaleString('de-DE',{maximumFractionDigits:2});
-    $('i-rendite').innerHTML=`Das Pflegeappartement bringt ${r1} % Brutto-Mietrendite, die Personalwohnung ${r2} % bei Vollvermietung. Bei der Personalwohnung ist die Miete belegungsabhängig, gerechnet wird mit ${Math.round(occ*100)} % Vermietung. Pro investiertem Euro fließt beim Pflegeappartement also mehr Miete, und durch die Indexierung wächst sie weiter. Die Personalwohnung holt einen Teil über höhere Steuervorteile in den ersten Jahren wieder auf. <b>Mit Ihren Angaben liegt nach ${years} Jahren ${lead} um ${eur.format(Math.abs(gA-gB))} vorne.</b>`;
+    $('i-rendite').innerHTML=`Das Pflegeappartement bringt ${r1} % Brutto-Mietrendite, die Personalwohnung ${r2} % bei Vollvermietung. Bei der Personalwohnung ist die Miete belegungsabhängig, gerechnet wird mit ${Math.round(occ*100)} % Vermietung. Pro investiertem Euro fließt beim Pflegeappartement also mehr Miete, und durch die Indexierung wächst sie weiter. Die Personalwohnung holt einen Teil über höhere Steuervorteile in den ersten Jahren wieder auf. <b>Mit Ihren Angaben liegt nach ${years} Jahren ${lead} um ${eur.format(Math.abs(gA-gB))} vorne.</b> Weil die Kaufpreise unterschiedlich hoch sind, zählt für den Balken der Ertrag je eingesetztem Euro: Pflegeappartement ${Math.round(100*gA/A.need)} %, Personalwohnung ${Math.round(100*gB/B.need)} % des Erwerbsaufwands.`;
     const tA=tax4(A), tB=tax4(B);
+    const cA=cash1(A), cB=cash1(B), fm=v=>(v>=0?'+':'')+eur.format(v);
+    $('i-liqu').innerHTML=`Hier zählt, was nach Kreditrate, Kosten und Steuern jeden Monat übrig bleibt oder zugezahlt werden muss. Die Personalwohnung ist günstiger im Einkauf und bringt in den ersten Jahren hohe Steuervorteile, dadurch ist die monatliche Belastung meist geringer. <b>Mit Ihren Angaben: Pflegeappartement ${fm(cA)}, Personalwohnung ${fm(cB)} pro Monat im zweiten Jahr.</b>`;
+    const iA=Math.round((grow(A)-1)*100), iB=Math.round((grow(B)-1)*100);
+    $('i-inflation').innerHTML=`Beim Pflegeappartement steigt die Miete um 7 %, sobald der Verbraucherpreisindex um 10 % gestiegen ist. Bei der Personalwohnung gibt es keine Indexierung, Erhöhungen richten sich nach dem regulären Mietrecht. <b>Mit Ihren Annahmen steigt die Miete in 15 Jahren beim Pflegeappartement um ${iA} %, bei der Personalwohnung um ${iB} %.</b>`;
     $('i-steuer').innerHTML=`Bei der Personalwohnung sind 5 % degressive Abschreibung plus 5 % Sonderabschreibung nach § 7b in den ersten vier Jahren möglich, beim Pflegeappartement 3 % linear. Höhere Abschreibungen senken Ihr zu versteuerndes Einkommen. Je höher Ihr Steuersatz, desto stärker wirkt das. <b>Mit Ihren Angaben sparen Sie in den ersten vier Jahren ${eur.format(tB)} (Personalwohnung) gegenüber ${eur.format(tA)} (Pflegeappartement).</b>`; }
   drawChart(a,b);
   window._summary = `Anlagerechner\nEigenkapital: ${eur.format(ek)}, zvE: ${eur.format(inc)}, Alter: ${age}, ${state.fam==='joint'?'zusammen veranlagt':'einzeln veranlagt'}\nKaufpreis Pflegeappartement: ${eur.format(+$('kp1').value)}, Personalwohnung: ${eur.format(+$('kp2').value)}\nErgebnis nach ${years} Jahren: Pflegeappartement ${eur.format(g(A,years))}, Personalwohnung ${eur.format(g(B,years))}\nSteuerersparnis erste 4 Jahre: PA ${eur.format(tax4(A))}, Personalwohnung ${eur.format(tax4(B))}\nPassung: Pflegeappartement ${pA} %, Personalwohnung ${pB} %`;
